@@ -18,18 +18,27 @@ const dbConnection = async () => {
     const db = client.db(dbName);
     const books = db.collection("BPBOnlineBooksCollection");
     //Add a new book to the collection
-    const insertNewBook = await books.insertOne({
+    /*     const insertNewBook = await books.insertOne({
       "Book-title": "Harry Potter",
       "Book-author": "JK Rawling",
       "Book-ISBN": "2234567890129",
       "Book-pages": "500",
       "Book-brief-description": "The wizard world"
-    });
+    }); */
 
-    const listBooks = await books
-      .find({ "Book-title": "Harry Potter" })
-      .toArray();
+    const query = { "Book-title": "Harry Potter" };
+    const options = {
+      sort: { "Book-pages": 1 },
+      projection: { _id: 0, "Book-title": 1, "Book-pages": 500 }
+    };
+    const listBooks = await books.find(query, options).toArray();
     console.log(listBooks);
+
+    //find the storage statistics
+    /*  const result = await db.command({
+      dbStats: 1
+    }); */
+    console.log(result);
   } catch (error) {
     console.log(error);
   } finally {
