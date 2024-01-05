@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/books", books);
+app.use("/books", cors(), books);
 
 //start the express server
 app.listen(PORT, () => {

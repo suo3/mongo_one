@@ -23,10 +23,11 @@ router.get("/:bookid", async (req, res) => {
 //create a new record
 router.post("/", async (req, res) => {
   let newBook = {
-    title: req.body.name,
+    title: req.body.title,
     author: req.body.author,
     pages: req.body.pages,
-    isbnNumber: req.body.isbnNumber
+    isbnNumber: req.body.isbnNumber,
+    thumbsUp: req.body.thumbsUp
   };
 
   let collection = await db.collection("BPBOnlineBooksCollection");
@@ -35,14 +36,43 @@ router.post("/", async (req, res) => {
 });
 
 //updating existing book
-router.put("/:bookid", async (req, res) => {
+router.patch("/:bookid", async (req, res) => {
   const query = { _id: new ObjectId(req.params.bookid) };
+
   const updateBook = {
     $set: {
       title: req.body.title,
       author: req.body.author,
       pages: req.body.pages,
-      isbnNumber: req.body.isbnNumber
+      isbnNumber: req.body.isbnNumber,
+      thumbsUp: req.params.thumbsUp,
+      thumbsDown: req.params.thumbsDown
+    }
+  };
+  const collection = await db.collection("BPBOnlineBooksCollection");
+  const results = await collection.updateOne(query, updateBook);
+  res.send(results).status(200);
+});
+
+//upating thumbsUp endpoint
+
+router.patch("/thumbsUp/:bookid", async (req, res) => {
+  const query = { _id: new ObjectId(req.params.bookid) };
+  const rating = () => {
+    if (isNaN(req.body.thumbsUp)) {
+      return 1;
+    } else {
+      return req.body.thumbsUp + 1;
+    }
+  };
+  const updateBook = {
+    $set: {
+      title: req.body.title,
+      author: req.body.author,
+      pages: req.body.pages,
+      isbnNumber: req.body.isbnNumber,
+      thumbsUp: rating(),
+      thumbsDown: req.body.thumbsDown
     }
   };
   const collection = await db.collection("BPBOnlineBooksCollection");
